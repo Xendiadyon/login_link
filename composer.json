@@ -1,0 +1,26 @@
+{
+  "name": "thescrat/login_link",
+  "description": "Frontendlogin per URL",
+  "keywords":["contao", "login", "frontend", "login_link", "link","loginlink"],
+  "type": "contao-module",
+  "license": "LGPL-3.0+",
+  "authors": [
+    {
+      "name": "Michael Fleischmann",
+      "email": "info@michael-fleischmann.com"
+    }
+  ],
+  "require": {
+    "contao/core":">=3.2,<4",
+  },
+  "replace": {
+    "contao-legacy/login_link": "self.version"
+  },
+  "extra":{
+    "contao": {
+      "sources":{
+        "": "system/modules/login_link"
+      }
+    }
+  }
+}
