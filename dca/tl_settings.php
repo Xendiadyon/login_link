@@ -37,7 +37,7 @@
 /**
  * System configuration
  */
-$GLOBALS['TL_DCA']['tl_settings']['palettes']['default'] .= ';{login_link_legend},login_link_autoKey,login_link_defaultKeyLength,login_link_useDefaultExpireTime';
+$GLOBALS['TL_DCA']['tl_settings']['palettes']['default'] .= ';{login_link_legend},login_link_autoKey,login_link_defaultKeyLength,login_link_useDefaultExpireTime,login_link_generateKeysForAllMembers';
 
 
 array_insert($GLOBALS['TL_DCA']['tl_settings'],count($GLOBALS['TL_DCA']['tl_settings']),array
@@ -63,39 +63,73 @@ array_insert($GLOBALS['TL_DCA']['tl_settings'],count($GLOBALS['TL_DCA']['tl_sett
 		'login_link_autoKey' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_settings']['login_link_autoKey'],
-			'inputType'        => 'checkbox',
+			'inputType'        => 'select',
+			'options'		=> array('','onActivateAccount','onCreateNewUser'),
+			'reference'		=> $GLOBALS['TL_LANG']['tl_settings']['login_link_autoKey_ref'],
 			'eval'                    => array('tl_class'=>'clr')
 		),
 		'login_link_defaultKeyLength' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_settings']['login_link_defaultKeyLength'],
-			'default'				=> '15',
+			'default'		=> '15',
 			'inputType'        => 'select',
-			'options'				=> range(10,50),
+			'options'		=> range(10,50),
 			'eval'                    => array('tl_class'=>'clr')
 		),
 		'login_link_useDefaultExpireTime' => array
 		(
 			'label'                   		=> &$GLOBALS['TL_LANG']['tl_settings']['login_link_useDefaultExpireTime'],
-			'inputType'				=> 'checkbox',
-			'eval'							=> array('submitOnChange'=>true, 'tl_class'=>'clr')
+			'inputType'			=> 'checkbox',
+			'eval'				=> array('submitOnChange'=>true, 'tl_class'=>'clr')
 		),
 		'login_link_defaultExpireTime' => array
 		(
 			'label'                   		=> &$GLOBALS['TL_LANG']['tl_settings']['login_link_defaultExpireTime'],
-			'inputType'				=> 'timePeriod',
-			'options'					=> array('m','h','d','w','M'),
-			'reference'				=> &$GLOBALS['TL_LANG']['tl_settings']['intervalReference'],
+			'inputType'			=> 'timePeriod',
+			'options'			=> array('m','h','d','w','M'),
+			'reference'			=> &$GLOBALS['TL_LANG']['tl_settings']['intervalReference'],
 			'save_callback'		=> array(array('tl_login_link_settings','saveInterval')),
 			'load_callback'		=> array(array('tl_login_link_settings','loadInterval')),
-			'eval'							=> array('rgxp'=>'digit')
-		)
+			'eval'				=> array('rgxp'=>'digit')
+		),
+		'login_link_generateKeysForAllMembers' => array
+		(
+			  'label'                   	=> &$GLOBALS['TL_LANG']['tl_settings']['login_link_generateKeysForAllMembers'],
+			  'inputType'		=> 'checkbox',
+			  'eval'				=> array('submitOnChange'=>true, 'tl_class'=>'clr'),
+			  'save_callback' 	=> array
+			  (
+				    array('tl_login_link_settings','generateKeysForAllMembers')
+			  ),
+		),
 	)
 ));
 
 
 class tl_login_link_settings extends System
 {
+
+	public function generateKeysForAllMembers($intField)
+	{
+		if(!$intField)
+			return '';
+
+		$objMembers = \Database::getInstance()->execute("SELECT * FROM tl_member WHERE loginLink = ''");
+
+		while($objMembers->next())
+		{
+			\Database::getInstance()->prepare("UPDATE tl_member %s WHERE id = ?")->set
+			(
+				  array
+				(
+					'loginLink'	=> \LoginLink::generateLoginKey(),
+				)
+			)->execute($objMembers->id);
+		}
+
+		$_SESSION['TL_INFO'][] = sprintf('LoginKeys für %s Mitglieder generiert und gespeichert!',$objMembers->numRows);
+		\Config::persist('login_link_generateKeysForAllMembers','');
+	}
 
 	public function saveInterval($val,$dc)
 	{

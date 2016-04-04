@@ -5,7 +5,7 @@
 /**
  *
  *
- * @copyright  Michael Fleischmann 2015
+ * @copyright  Michael Fleischmann 2016
  * @author     Michael Fleischmann <info@michael-fleischmann.com>
  * @package    login_link
  * @license    LGPL
@@ -48,10 +48,10 @@ array_insert($GLOBALS['TL_DCA']['tl_member']['fields'],count($GLOBALS['TL_DCA'][
 	),
 	'jumpTo'    => array
 	(
-		'label'		=> &$GLOBALS['TL_LANG']['tl_member']['jumpTo'],
-		'inputType'	=> 'pageTree',
-		'eval'		=> array('fieldType'=>'radio', 'tl_class'=>'long'),
-		'sql'		=>	"int(10) unsigned NOT NULL default '0'"
+		'label'			=> &$GLOBALS['TL_LANG']['tl_member']['jumpTo'],
+		'inputType'		=> 'pageTree',
+		'eval'			=> array('fieldType'=>'radio', 'tl_class'=>'long'),
+		'sql'			=>	"int(10) unsigned NOT NULL default '0'"
 	),
 ));
 
@@ -63,15 +63,7 @@ class tl_loginLink extends Backend
 	{
 		if($varValue)
 		{
-
-			if($GLOBALS['TL_CONFIG']['login_link_defaultKeyLength']):
-				$intKeyLength = $GLOBALS['TL_CONFIG']['login_link_defaultKeyLength'];
-				$this->authKey = substr(base64_encode(uniqid(mt_rand()).uniqid(mt_rand())),0,$intKeyLength);
-			else:
-				$this->authKey = substr(base64_encode(uniqid(mt_rand())), 0, 15);
-			endif;
-
-			\Database::getInstance()->prepare('UPDATE tl_member SET loginLink = ? WHERE id = ?')->execute($this->authKey, $dc->id);
+			\Database::getInstance()->prepare('UPDATE tl_member SET loginLink = ? WHERE id = ?')->execute(LoginLink::generateLoginKey(), $dc->id);
 		}
 		return 0; // reset checkbox
 	}

@@ -28,6 +28,7 @@
  * @filesource
  */
 $GLOBALS['TL_HOOKS']['generatePage'][] = array('LoginLink', 'login');
+$GLOBALS['TL_HOOKS']['createNewUser'][] = array('LoginLink', 'createNewUser');
 $GLOBALS['TL_HOOKS']['activateAccount'][] = array('LoginLink', 'activateAccount');
 
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][]     = array('LoginLink', 'replaceInsertTagsLoginLink');
