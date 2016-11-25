@@ -1,5 +1,5 @@
 {
-  "name": "thescrat/login_link",
+  "name": "xendiadyon/login_link",
   "description": "Frontendlogin per URL",
   "keywords":["contao", "login", "frontend", "login_link", "link","loginlink"],
   "type": "contao-module",
