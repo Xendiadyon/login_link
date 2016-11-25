@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "contao/core":">=3.2,>=4"
+    "contao/core":">=3.2,^4.2"
   },
   "replace": {
     "contao-legacy/login_link": "self.version"
